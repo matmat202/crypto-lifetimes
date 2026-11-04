@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is Your Bank Quantum-Safe? Every FDIC-insured bank's website, tested</title>
+<meta name="description" content="We connected to the website of every FDIC-insured US bank and asked for post-quantum key exchange. Two in three said yes, and mostly because their CDN chose for them. Look up yours.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://matmat202.github.io/crypto-lifetimes/banks.html">
+<meta property="og:title" content="Is Your Bank Quantum-Safe?">
+<meta property="og:description" content="Every FDIC-insured bank's website, tested for post-quantum key exchange. Look up yours.">
+<meta property="og:image" content="https://matmat202.github.io/crypto-lifetimes/icons/card.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+  :root { --accent:#2f7d6d; --bg:#fbfaf7; --fg:#1d1d1f; --mute:#6b6b70; --line:#dcdad3; --card:#fff;
+          --yes:#2f7d6d; --no:#c2413b; --unk:#8a8a90; --sel:#e9e6dc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --accent:#4fb3a0; --bg:#141416; --fg:#ececee; --mute:#9a9aa2; --line:#34343a; --card:#1d1d21;
+            --yes:#4fb3a0; --no:#ea6a62; --unk:#9a9aa2; --sel:#2a2a30; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.1rem; margin: 28px 0 8px; }
+  .sub { color: var(--mute); margin: 0 0 18px; }
+  #headline { font-size: 1.25rem; font-weight: 600; margin: 0 0 6px; }
+  #lede { margin: 0 0 18px; }
+  label { display: block; font-weight: 600; margin-bottom: 4px; }
+  #q { width: 100%; font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--fg); }
+  #results { list-style: none; margin: 8px 0 0; padding: 0; }
+  #results li { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; }
+  #results .nm { font-weight: 600; }
+  #results .meta { color: var(--mute); font-size: .85rem; overflow-wrap: anywhere; }
+  .tag { display: inline-block; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; border-radius: 4px; padding: 0 6px; margin-right: 6px; color: var(--bg); }
+  .tag.yes { background: var(--yes); } .tag.no { background: var(--no); } .tag.unknown { background: var(--unk); }
+  #hint { color: var(--mute); font-size: .85rem; margin: 6px 0 0; }
+  .bars { display: grid; grid-template-columns: minmax(0, 11em) 1fr 3.2em; gap: 4px 10px; align-items: center; font-size: .9rem; }
+  .bars .lbl { overflow-wrap: anywhere; } .bars .lbl small { color: var(--mute); }
+  .bars .track { background: var(--sel); border-radius: 3px; height: 14px; overflow: hidden; }
+  .bars .fill { background: var(--yes); height: 100%; }
+  .bars .v { font-variant-numeric: tabular-nums; text-align: right; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  td { padding: 4px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td:last-child { overflow-wrap: anywhere; }
+  footer { color: var(--mute); font-size: .85rem; margin-top: 28px; }
+  footer p { margin: 0 0 8px; }
+  a { color: inherit; }
+  .err { color: var(--no); }
+</style>
+</head>
+<body>
+<main>
+  <p class="sub"><a href="./">Crypto Lifetimes</a> · post-quantum check</p>
+  <h1>Is Your Bank Quantum-Safe?</h1>
+  <p class="sub">We connected to the website of every FDIC-insured bank in the US and asked it for post-quantum key exchange.</p>
+  <p id="headline">&nbsp;</p>
+  <p id="lede">&nbsp;</p>
+
+  <label for="q">Look up your bank</label>
+  <input id="q" type="search" placeholder="Bank name, city or state" autocomplete="off">
+  <p id="hint">Type at least two letters.</p>
+  <ul id="results" aria-live="polite"></ul>
+
+  <h2>Who serves the site decides</h2>
+  <p class="sub">Share with post-quantum key exchange, by the network or host in front of the bank's website.</p>
+  <div id="prov" class="bars"></div>
+
+  <h2>Bigger banks, a little more often</h2>
+  <p class="sub">The same share, banks split into five equal groups by assets.</p>
+  <div id="size" class="bars"></div>
+
+  <h2>The ten biggest</h2>
+  <table id="big"></table>
+
+  <footer>
+    <p><b>Why it matters.</b> Traffic recorded today can be decrypted later by anyone who builds a large enough quantum computer ("harvest now, decrypt later"). A post-quantum key exchange (ML-KEM, standardised by NIST in 2024, combined with X25519) closes that hole for the connection. Nothing breaks today without it. See <a href="./">Crypto Lifetimes</a> for how long ciphers have lasted.</p>
+    <p><b>What was tested.</b> One TLS handshake per bank from a single US machine, to the website the FDIC lists for it (<code>api.fdic.gov</code>), offering only X25519MLKEM768. A refusal was followed by an ordinary handshake, to tell a server without the group from one stuck on TLS 1.2. Failed connections were retried once. <span id="when"></span></p>
+    <p><b>What was not.</b> The bank's online-banking login, its app and its back-end systems can sit on different servers, so a "yes" here is about the public website only. The network column comes from the site's DNS name chain and <code>Server</code> header. "Own servers or a smaller host" means none of the known networks or hosts was recognised. The lede's content-delivery networks are Cloudflare, Akamai, Fastly, CloudFront, Imperva, Azure Front Door, Sucuri and StackPath; web hosts and cloud load balancers count as "any other way".</p>
+  </footer>
+</main>
+<script src="bank-logic.js"></script>
+<script src="banks.js"></script>
+</body>
+</html>
