@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crypto Lifetimes: when every cipher, hash and protocol was born, cracked and retired</title>
+<meta name="description" content="29 ciphers, hashes, key exchanges and protocols from 1976 to today: when each was published, first weakened, practically broken and retired, every date quoted from its source.">
+<style>
+  :root { --bg:#fbfaf7; --fg:#1d1d1f; --mute:#6b6b70; --line:#dcdad3; --card:#fff;
+          --sound:#2f7d6d; --weak:#d08a1c; --broken:#c2413b; --sel:#e9e6dc; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141416; --fg:#ececee; --mute:#9a9aa2; --line:#34343a; --card:#1d1d21;
+            --sound:#4fb3a0; --weak:#e5a443; --broken:#ea6a62; --sel:#2a2a30; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--mute); margin: 0 0 18px; }
+  #headline { font-size: 1.25rem; font-weight: 600; margin: 0 0 6px; }
+  #lede { margin: 0 0 18px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--mute); margin-bottom: 8px; }
+  .legend i { display: inline-block; width: 18px; height: 8px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+  .legend .capk { width: 2px; height: 14px; background: var(--fg); border-radius: 0; }
+  .legend .fellk { width: 8px; height: 8px; border-radius: 50%; background: var(--broken); }
+  .legend .dot { border-top: 2px dotted var(--mute); height: 0; border-radius: 0; background: none; }
+  .tools { font-size: .85rem; color: var(--mute); margin-bottom: 6px; }
+  .tools button { font: inherit; background: none; border: 1px solid var(--line); color: var(--fg); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+  .tools button[aria-pressed=true] { background: var(--sel); border-color: var(--mute); }
+  #chart { width: 100%; display: block; }
+  #chart .row { cursor: pointer; }
+  #chart .row:hover .hl, #chart .row.on .hl { fill: var(--sel); }
+  #chart .row:focus-visible { outline: 2px solid var(--fg); outline-offset: -1px; }
+  #chart text { fill: var(--fg); font-size: 12px; }
+  #chart .axis text { fill: var(--mute); font-size: 11px; }
+  #chart .axis line { stroke: var(--line); }
+  #chart .now { stroke: var(--mute); stroke-dasharray: 2 3; }
+  .s-sound { fill: var(--sound); } .s-weakened { fill: var(--weak); } .s-broken { fill: var(--broken); }
+  .after { stroke: var(--mute); stroke-dasharray: 1.5 3; }
+  .cap { stroke: var(--fg); stroke-width: 2; }
+  #detail { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-top: 14px; min-height: 4em; }
+  #detail h3 { margin: 0 0 2px; font-size: 1.1rem; }
+  #detail .fam { color: var(--mute); font-size: .85rem; margin: 0 0 8px; }
+  #detail ol { list-style: none; margin: 0; padding: 0; }
+  #detail li { margin: 0 0 8px; padding-left: 64px; position: relative; }
+  #detail li b { position: absolute; left: 0; width: 56px; font-variant-numeric: tabular-nums; }
+  #detail .k { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--mute); margin-right: 6px; }
+  #detail q { display: block; color: var(--mute); font-size: .85rem; }
+  #detail a { color: inherit; }
+  #detail .note { margin: 8px 0 0; font-style: italic; }
+  footer { color: var(--mute); font-size: .85rem; margin-top: 28px; }
+  footer dt { font-weight: 600; color: var(--fg); display: inline; } footer dd { display: inline; margin: 0 0 0 4px; } footer dd::after { content: ""; display: block; }
+  .err { color: var(--broken); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Crypto Lifetimes</h1>
+  <p class="sub">When each cipher, hash, key exchange and protocol was born, cracked, broken and retired, from 1976 to today.</p>
+  <p id="headline">&nbsp;</p>
+  <p id="lede">&nbsp;</p>
+  <div class="legend" aria-hidden="true">
+    <span><i style="background:var(--sound)"></i>no known attack</span>
+    <span><i style="background:var(--weak)"></i>weakened on paper</span>
+    <span><i style="background:var(--broken)"></i>broken in practice</span>
+    <span><i class="dot"></i>attack after retirement</span>
+    <span><i class="capk"></i>retired</span>
+    <span><i class="fellk"></i>broken, never a standard</span>
+  </div>
+  <div class="tools">Order: <button id="by-born" aria-pressed="true">by birth</button> <button id="by-family" aria-pressed="false">by kind</button></div>
+  <svg id="chart" role="img" aria-label="Timeline of cryptographic algorithm lifetimes"></svg>
+  <section id="detail" aria-live="polite"><p class="fam">Tap any row for its dates and the source of each.</p></section>
+  <footer>
+    <dl>
+      <dt>Born</dt><dd>first published or standardised.</dd>
+      <dt>Weakened</dt><dd>first published attack better than brute force, even if far from practical.</dd>
+      <dt>Broken</dt><dd>an attack shown to work: a collision found, a key or plaintext recovered.</dd>
+      <dt>Retired</dt><dd>the first ban, withdrawal or deprecation by a standards body (IETF, NIST, IEEE).</dd>
+    </dl>
+    <p>Every date quotes its source (Wikipedia or the RFC itself); tap a row to read the quote. A build check refuses any date whose quote is missing from its source or does not state that year.</p>
+  </footer>
+</main>
+<script src="life-logic.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
