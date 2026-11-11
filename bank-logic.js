@@ -86,11 +86,14 @@
     noweb: ["unknown", "The FDIC lists no website for this bank."]
   };
   function verdict(r) { return VERDICT[r[V]] || ["unknown", "Unknown result."]; }
+  // The unit is chosen AFTER rounding: $999.6 million (Vision Bank, 2026 scan) printed as
+  // "$1000 million" when the unit was picked from the raw value.
   function money(k) { // assets in thousands of dollars
-    var d = (k || 0) * 1000;
-    if (d >= 1e12) return "$" + (d / 1e12).toFixed(1) + " trillion";
-    if (d >= 1e9) return "$" + (d / 1e9).toFixed(d >= 1e10 ? 0 : 1) + " billion";
-    return "$" + Math.round(d / 1e6) + " million";
+    var d = (k || 0) * 1000, m = Math.round(d / 1e6), b = d / 1e9;
+    if (m < 1000) return "$" + m + " million";
+    if (+b.toFixed(1) < 10) return "$" + b.toFixed(1) + " billion";
+    if (+b.toFixed(0) < 1000) return "$" + b.toFixed(0) + " billion";
+    return "$" + (d / 1e12).toFixed(1) + " trillion";
   }
   return { summary: summary, headline: headline, lede: lede, byProvider: byProvider, bySize: bySize,
            search: search, verdict: verdict, isCdn: isCdn, pct: pct, money: money, norm: norm, COLS: { N: N, CITY: CITY, ST: ST, ASSETS: ASSETS, HOST: HOST, V: V, PROV: PROV } };
