@@ -56,20 +56,38 @@
         el("line", { class: "after", x1: x(end), x2: x(last), y1: cy, y2: cy }, g);
         for (const e of late) el("circle", { class: "late " + (e.kind === "broken" ? "s-broken" : "s-weakened"), cx: x(e.year), cy, r: 3.5 }, g);
       }
-      g.addEventListener("click", () => pick(a.name));
-      g.addEventListener("keydown", (k) => { if (k.key === "Enter" || k.key === " ") { k.preventDefault(); pick(a.name); } });
+      g.addEventListener("click", () => pick(a.name, true));
+      g.addEventListener("keydown", (k) => { if (k.key === "Enter" || k.key === " ") { k.preventDefault(); pick(a.name, true); } });
     });
   }
 
+  // A row's address in the URL (#sha-1, #ml-kem-kyber), so one algorithm's card can be shared.
+  const slug = (name) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  // The card sits under a chart taller than a phone screen: a tap on a top row changed
+  // nothing you could see. Bring whatever was just opened or tapped into view.
+  const reveal = (node) => {
+    const r = node.getBoundingClientRect();
+    if (r.top >= 0 && r.top < innerHeight - 80) return;
+    node.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
+
   const KIND = { born: "born", weak: "weakened", broken: "broken", retired: "retired" };
-  function pick(name) {
+  function pick(name, show) {
     picked = name;
     const a = data.algorithms.find((x) => x.name === name);
     const evs = [...a.events].sort((p, q) => p.year - q.year);
     $("detail").innerHTML = `<h3>${esc(a.name)}</h3><p class="fam">${esc(a.family)} · ${esc(LL.status(a))}${LL.yr(a, "retired") == null && !a.never_standard ? " · still in use" : ""}</p><ol>` +
       evs.map((e) => `<li data-kind="${e.kind}"><b>${e.year}</b><span class="k">${KIND[e.kind]}</span>${esc(e.what)}<q><a href="${esc(e.url)}" rel="noopener">${esc(e.quote)}</a></q></li>`).join("") +
-      `</ol>${a.note ? `<p class="note">${esc(a.note)}</p>` : ""}`;
+      `</ol>${a.note ? `<p class="note">${esc(a.note)}</p>` : ""}` +
+      `<p class="back"><button type="button" id="to-chart">↑ back to the chart</button> <a href="#${slug(name)}" id="share">link to ${esc(a.short)}</a></p>`;
     document.querySelectorAll("#chart .row").forEach((r) => r.classList.toggle("on", r.dataset.name === name));
+    $("to-chart").onclick = () => { const r = document.querySelector(`#chart .row[data-name="${CSS.escape(name)}"]`); if (r) { r.scrollIntoView({ block: "center" }); r.focus({ preventScroll: true }); } };
+    history.replaceState(null, "", "#" + slug(name));
+    if (show) reveal($("detail"));
+  }
+  function fromHash() {
+    const a = data.algorithms.find((x) => "#" + slug(x.name) === location.hash);
+    if (a) pick(a.name, true);
   }
 
   function setOrder(o) {
@@ -87,6 +105,8 @@
     $("by-born").onclick = () => setOrder("born");
     $("by-family").onclick = () => setOrder("family");
     draw();
+    fromHash();
+    addEventListener("hashchange", fromHash);
     let t; addEventListener("resize", () => { clearTimeout(t); t = setTimeout(draw, 120); });
   }).catch(() => {
     $("headline").innerHTML = '<span class="err">Could not load the data. Try reloading.</span>';
