@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The warning comes years early · Crypto Lifetimes, a story</title>
+<meta name="description" content="A story from Crypto Lifetimes: 12 of 30 ciphers, hashes and protocols were first weakened on paper, and 9 of those were later broken in practice, a median 8 years after the warning. AES has carried its paper attack for 17 years; only SSL 2.0 waited longer for its break.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="plot" aria-hidden="true"></div>
+<p id="err" role="alert"></p>
+<main>
+
+<section class="step" data-step="warned"><div>
+  <p class="kicker">Crypto Lifetimes · a story</p>
+  <h1>The warning comes years early</h1>
+  <p><a href="../">Crypto Lifetimes</a> dates two moments in each algorithm’s decline: the
+  first attack on paper, better than brute force but nowhere near practical, and the first
+  attack that worked.</p>
+  <p><b data-fact="n_warned"></b> of the 30 got the paper attack first, and
+  <b data-fact="n_broke"></b> of those were later broken for real: a median
+  <b data-fact="gap_median"></b> after the warning, and never sooner than
+  <b data-fact="gap_min"></b>. Each bar runs from the paper attack to the break; the red line
+  is the median. No one slow case drags it there: leave out the slowest, and the median
+  moves by less than a year.</p>
+  <p class="small">Scroll ↓</p>
+</div></section>
+
+<section class="step" data-step="open"><div>
+  <p class="kicker">Chapter 1 · Still waiting</p>
+  <h2>AES is past almost every countdown</h2>
+  <p>In <b data-fact="open_since"></b> a related-key attack beat brute force on
+  <b data-fact="open_name"></b>, on paper. It needs more work than has ever been done, and
+  nothing has come of it: <b data-fact="open_wait"></b> so far, the red bar.</p>
+  <p>Only <b data-fact="longer_than_open"></b> of the <b data-fact="n_broke"></b> breaks took
+  longer to arrive: <b data-fact="max_name"></b>, <b data-fact="gap_max"></b>, and by then it
+  had already been retired. The other two warned algorithms,
+  <b data-fact="retired_unbroken"></b> were retired before any break came (the dark bars).</p>
+</div></section>
+
+<section class="step" data-step="calendar"><div>
+  <p class="kicker">Chapter 2 · No warning</p>
+  <h2>Not every break is announced</h2>
+  <p><b data-fact="n_unwarned"></b> of the breaks, the red squares, came with no paper attack
+  on the record before them: WEP, DVD CSS and POODLE against SSL 3.0 among them. They broke a
+  median <b data-fact="unwarned_median"></b> after they were born.</p>
+  <p>Read <b data-fact="n_unwarned"></b> as the most that came unannounced, not a count of
+  them. Crypto Lifetimes only lists a weakness it can quote
+  from its source, and some of these had warnings it does not list: TLS 1.0’s CBC flaw was
+  described in 2002, nine years before BEAST used it.</p>
+</div></section>
+
+<section class="step" data-step="warned"><div>
+  <p class="kicker">Epilogue · Reading Crypto Lifetimes</p>
+  <h2>Look one up</h2>
+  <p>On <a href="../">Crypto Lifetimes</a>, tap any row to see its dates and read the quote
+  behind each one. The amber stretch of a bar is its warning.</p>
+  <p class="small">Data: the 30 algorithms Crypto Lifetimes ships, as of
+  <b data-fact="now"></b>. A paper attack is the first published attack better than brute
+  force; a break is the first shown to work, as the page defines them. A paper attack
+  published after the break is not counted as a warning. This counts when, not why. The
+  program is
+  <a href="https://github.com/matmat202/crypto-lifetimes/blob/main/story/build_story.py">in the repository</a>.</p>
+</div></section>
+
+</main>
+<script type="module" src="story.js"></script>
+</body>
+</html>
