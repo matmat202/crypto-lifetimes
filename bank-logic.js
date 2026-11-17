@@ -95,6 +95,26 @@
     if (+b.toFixed(0) < 1000) return "$" + b.toFixed(0) + " billion";
     return "$" + (d / 1e12).toFixed(1) + " trillion";
   }
+  // How old the scan is, in whole UTC calendar days -- what a reader means by "days ago",
+  // not elapsed hours (a scan at 23:00 yesterday is "1 day ago", not "0"). The zone must be
+  // explicit: "2026-11-04T22:30" with no Z parses as LOCAL time in V8 and would read an hour
+  // or thirteen off depending on the machine, so an unzoned or unparseable stamp returns null
+  // and the caller says nothing rather than something wrong.
+  function scanAge(iso, now) {
+    if (typeof iso !== "string" || !/(Z|[+-]\d{2}:?\d{2})$/.test(iso)) return null;
+    var t = Date.parse(iso);
+    if (isNaN(t)) return null;
+    var d = new Date(t), n = new Date(now == null ? Date.now() : now);
+    var a = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    var b = Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate());
+    return Math.round((b - a) / 86400000);
+  }
+  function ageText(days) {
+    if (days == null || days < 0) return "";
+    return days === 0 ? "today" : days === 1 ? "yesterday" : days + " days ago";
+  }
+
   return { summary: summary, headline: headline, lede: lede, byProvider: byProvider, bySize: bySize,
-           search: search, verdict: verdict, isCdn: isCdn, pct: pct, money: money, norm: norm, COLS: { N: N, CITY: CITY, ST: ST, ASSETS: ASSETS, HOST: HOST, V: V, PROV: PROV } };
+           search: search, verdict: verdict, isCdn: isCdn, pct: pct, money: money, norm: norm,
+           scanAge: scanAge, ageText: ageText, COLS: { N: N, CITY: CITY, ST: ST, ASSETS: ASSETS, HOST: HOST, V: V, PROV: PROV } };
 });

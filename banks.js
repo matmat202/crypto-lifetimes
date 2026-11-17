@@ -34,7 +34,10 @@
       var v = BL.verdict(r);
       return '<tr><td><span class="tag ' + v[0] + '">' + v[0] + '</span></td><td>' + esc(r[C.N]) + '</td><td>' + esc(r[C.HOST] || "no website listed") + '</td></tr>';
     }).join("");
-    $("when").textContent = "Scanned " + d.scanned_at.replace("T", " ").replace("Z", "") + " UTC with " + (d.openssl.match(/OpenSSL [\d.]+/) || ["OpenSSL"])[0] + "." +
+    // The age in words as well as the date: a reader should not have to work out that a
+    // stamp four months old is four months old. "" when the stamp cannot be read in UTC.
+    var age = BL.ageText(BL.scanAge(d.scanned_at));
+    $("when").textContent = "Scanned " + d.scanned_at.replace("T", " ").replace("Z", "") + " UTC" + (age ? " (" + age + ")" : "") + " with " + (d.openssl.match(/OpenSSL [\d.]+/) || ["OpenSSL"])[0] + "." +
       (d.recheck ? " A re-scan of " + d.recheck.n + " random banks changed " + d.recheck.flips + " verdict" + (d.recheck.flips === 1 ? "" : "s") + "." : "");
     function go() {
       var q = $("q").value, hits = q.trim().length >= 2 ? BL.search(rows, q, 12) : [];
