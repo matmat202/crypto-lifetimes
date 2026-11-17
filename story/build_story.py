@@ -42,7 +42,9 @@ def main():
     broke = [r for r in warned if r[2] is not None]
     gaps = sorted(r[2] - r[1] for r in broke)
     open_ = [r for r in warned if r[2] is None and r[3] is None]
-    assert len(open_) == 1, f"the story is about one warned, unbroken, unretired algorithm; found {open_}"
+    # the chapter follows the longest wait still running (AES); any younger ones are named in it
+    assert open_, "the story's middle chapter needs a warned algorithm still unbroken and in use"
+    open_.sort(key=lambda r: (r[1], r[0]))
     aes = open_[0]
     longest = max(broke, key=lambda r: r[2] - r[1])
     D = {
@@ -53,7 +55,7 @@ def main():
         "n_warned": len(warned), "n_broke": len(broke), "n_unwarned": len(unwarned),
         "gap_median": median(gaps), "gap_min": gaps[0], "gap_max": gaps[-1], "max_name": longest[0],
         "gap_median_wo_max": median(gaps[:-1]),
-        "open_name": aes[0], "open_wait": NOW - aes[1],
+        "open_name": aes[0], "open_wait": NOW - aes[1], "still_open": open_[1:],
         "longer_than_open": sum(1 for g in gaps if g > NOW - aes[1]),
         "unwarned_median": median(r[2] - r[1] for r in unwarned),
     }

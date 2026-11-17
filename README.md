@@ -1,6 +1,6 @@
 # Crypto Lifetimes
 
-When 30 ciphers, hashes, key exchanges and protocols were published, first weakened,
+When 32 ciphers, hashes, key exchanges and protocols were published, first weakened,
 practically broken and retired, 1976 to today. Every date is quoted verbatim from its
 source, and the page's headline is computed from the data.
 

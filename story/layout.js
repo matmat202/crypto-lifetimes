@@ -16,14 +16,15 @@ export function stats(D) {
   if (memo.has(D)) return memo.get(D);
   const broke = D.warned.filter((r) => r[2] != null);
   const gaps = broke.map((r) => r[2] - r[1]).sort((a, b) => a - b);
-  const open = D.warned.filter((r) => r[2] == null && r[3] == null);
-  if (open.length !== 1) throw new Error(`want one warned algorithm still unbroken and in use, found ${open.length}`);
+  // the chapter follows the longest wait still running; any younger ones are named in it
+  const open = D.warned.filter((r) => r[2] == null && r[3] == null).sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1));
+  if (!open.length) throw new Error('want a warned algorithm still unbroken and in use, found none');
   const longest = broke.reduce((b, r) => (r[2] - r[1] > b[2] - b[1] ? r : b));
   const S = {
     n_warned: D.warned.length, n_broke: broke.length, n_unwarned: D.unwarned.length,
     gap_median: median(gaps), gap_min: gaps[0], gap_max: gaps.at(-1), max_name: longest[0],
     gap_median_wo_max: median(gaps.slice(0, -1)),
-    open_name: open[0][0], open_wait: D.now - open[0][1],
+    open_name: open[0][0], open_wait: D.now - open[0][1], still_open: open.slice(1),
     unwarned_median: median(D.unwarned.map((r) => r[2] - r[1])),
     gaps, retired_unbroken: D.warned.filter((r) => r[2] == null && r[3] != null),
   };

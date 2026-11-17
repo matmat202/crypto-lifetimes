@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The warning comes years early · Crypto Lifetimes, a story</title>
-<meta name="description" content="A story from Crypto Lifetimes: 12 of 30 ciphers, hashes and protocols were first weakened on paper, and 9 of those were later broken in practice, a median 8 years after the warning. AES has carried its paper attack for 17 years; only SSL 2.0 waited longer for its break.">
+<meta name="description" content="A story from Crypto Lifetimes: 13 of 32 ciphers, hashes and protocols were first weakened on paper, and 9 of those were later broken in practice, a median 8 years after the warning. AES has carried its paper attack for 17 years; only SSL 2.0 waited longer for its break.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
   <p><a href="../">Crypto Lifetimes</a> dates two moments in each algorithm’s decline: the
   first attack on paper, better than brute force but nowhere near practical, and the first
   attack that worked.</p>
-  <p><b data-fact="n_warned"></b> of the 30 got the paper attack first, and
+  <p><b data-fact="n_warned"></b> of the 32 got the paper attack first, and
   <b data-fact="n_broke"></b> of those were later broken for real: a median
   <b data-fact="gap_median"></b> after the warning, and never sooner than
   <b data-fact="gap_min"></b>. Each bar runs from the paper attack to the break; the red line
@@ -35,8 +35,9 @@
   nothing has come of it: <b data-fact="open_wait"></b> so far, the red bar.</p>
   <p>Only <b data-fact="longer_than_open"></b> of the <b data-fact="n_broke"></b> breaks took
   longer to arrive: <b data-fact="max_name"></b>, <b data-fact="gap_max"></b>, and by then it
-  had already been retired. The other two warned algorithms,
-  <b data-fact="retired_unbroken"></b> were retired before any break came (the dark bars).</p>
+  had already been retired. Two of the other three warned algorithms,
+  <b data-fact="retired_unbroken"></b> were retired before any break came (the dark bars);
+  <b data-fact="still_open"></b> is still waiting too.</p>
 </div></section>
 
 <section class="step" data-step="calendar"><div>
@@ -56,7 +57,7 @@
   <h2>Look one up</h2>
   <p>On <a href="../">Crypto Lifetimes</a>, tap any row to see its dates and read the quote
   behind each one. The amber stretch of a bar is its warning.</p>
-  <p class="small">Data: the 30 algorithms Crypto Lifetimes ships, as of
+  <p class="small">Data: the 32 algorithms Crypto Lifetimes ships, as of
   <b data-fact="now"></b>. A paper attack is the first published attack better than brute
   force; a break is the first shown to work, as the page defines them. A paper attack
   published after the break is not counted as a warning. This counts when, not why. The

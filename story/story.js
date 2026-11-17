@@ -15,6 +15,7 @@ export function fact(D, f) {
     case 'gap_median': case 'gap_min': case 'gap_max': case 'open_wait': case 'unwarned_median': return yrs(S[f]);
     case 'max_name': case 'open_name': return S[f];
     case 'open_since': return String(D.warned.find((r) => r[0] === S.open_name)[1]);
+    case 'still_open': return S.still_open.map((r) => `${r[0]}, warned in ${r[1]},`).join(' and ');
     case 'retired_unbroken': return S.retired_unbroken.map((r) => `${r[0]}, in ${r[3]},`).join(' and ');
     default: throw new Error(`unknown fact ${f}`);
   }
@@ -48,7 +49,7 @@ async function main() {
     grid(L.L, L.B, L.R, L.B, 'grid axisline');
     const cap = {
       warned: narrow ? 'years from paper attack to break' : 'years from the first paper attack to the practical break',
-      open: narrow ? `${D.warned.find((r) => r[2] == null && r[3] == null)[0]} is still waiting` : 'the same, and the one still waiting: red',
+      open: narrow ? `${[stats(D).open_name, ...stats(D).still_open.map((r) => r[0])].join(' and ')} still waiting` : 'the same, and the ones still waiting: red',
       calendar: narrow ? 'every break, by year' : 'every practical break: warned (grey) and unwarned (red)',
     }[name];
     tick(gAxis, 4, L.T - 10, cap, 'tick cat');
