@@ -45,13 +45,17 @@
     const brokeAt = median(broke.map((a) => yr(a, "broken") - yr(a, "born")));
     const living = A.filter((a) => yr(a, "retired") == null && yr(a, "broken") == null)
       .map((a) => ({ name: a.name, age: now - yr(a, "born") })).sort((x, y) => y.age - x.age);
+    // A retirement already set for a future year (NIST IR 8547: RSA, ECC, DH after 2035), soonest first.
+    const scheduled = A.filter((a) => yr(a, "scheduled") != null && yr(a, "retired") == null)
+      .map((a) => ({ name: a.name, year: yr(a, "scheduled"), born: yr(a, "born") }))
+      .sort((x, y) => x.year - y.year || x.born - y.born);
     const neverRetired = broke.filter((a) => yr(a, "retired") == null && !a.never_standard).map((a) => a.name);
     return {
       total: A.length, retired: retired.length, retiredBeforeBroken: beforeBroken.length,
       lag: median(lagged.map((a) => yr(a, "retired") - yr(a, "broken"))), lagN: lagged.length,
       brokeAt, brokeN: broke.length, living,
       pastIt: living.filter((l) => brokeAt != null && l.age > brokeAt).map((l) => l.name),
-      neverRetired,
+      neverRetired, scheduled,
     };
   }
 
@@ -63,11 +67,21 @@
       ", and stayed in the standards a median " + yrs(s.lag) + " after that.";
   }
 
+  const and = (xs) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + " and " + xs[xs.length - 1];
+
+  // "Already scheduled to retire: Diffie-Hellman, RSA and ECC, disallowed after 2035."
+  function scheduledLine(sched) {
+    if (!sched || !sched.length) return "";
+    const years = [...new Set(sched.map((x) => x.year))];
+    return "Already scheduled to retire: " + years.map((y) =>
+      and(sched.filter((x) => x.year === y).map((x) => x.name)) + ", disallowed after " + y).join("; ") + ". ";
+  }
+
   function lede(s) {
     const past = s.living.filter((l) => s.pastIt.includes(l.name));
     const list = past.map((l, i) => l.name + " (" + (i ? l.age : yrs(l.age)) + ")").join(", ");
     return (past.length ? "Still unbroken and already past that age: " + list + ". " : "") +
-      s.retiredBeforeBroken + " of " + s.retired + " retirements came before any practical break.";
+      scheduledLine(s.scheduled) + s.retiredBeforeBroken + " of " + s.retired + " retirements came before any practical break.";
   }
 
   const api = { median, segments, status, stats, headline, lede, yr };

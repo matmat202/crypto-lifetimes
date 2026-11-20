@@ -27,12 +27,14 @@
     svg.textContent = "";
     const W = Math.max(320, svg.clientWidth || 900), narrow = W < 560;
     const LBL = narrow ? 92 : 168, R = 12, ROW = 24, TOP = 22;
-    const y0 = 1975, y1 = NOW + 1, x = (y) => LBL + (y - y0) / (y1 - y0) * (W - LBL - R);
+    // The axis runs past today to the latest retirement already scheduled (2035 for RSA, ECC, DH).
+    const ahead = Math.max(NOW, ...data.algorithms.map((a) => LL.yr(a, "scheduled") ?? NOW));
+    const y0 = 1975, y1 = ahead + 1, x = (y) => LBL + (y - y0) / (y1 - y0) * (W - LBL - R);
     const A = sorted(), H = TOP + A.length * ROW + 6;
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
     svg.setAttribute("height", H);
     const ax = el("g", { class: "axis" }, svg);
-    for (let y = 1980; y <= NOW; y += narrow ? 10 : 5) {
+    for (let y = 1980; y <= ahead; y += narrow ? 10 : 5) {
       el("line", { x1: x(y), x2: x(y), y1: TOP - 4, y2: H }, ax);
       el("text", { x: x(y), y: 12, "text-anchor": "middle" }, ax).textContent = y;
     }
@@ -49,6 +51,13 @@
       const retired = LL.yr(a, "retired") != null;
       if (a.never_standard) el("circle", { class: "fell s-broken", cx: x(end), cy, r: 4 }, g);
       if (retired) el("line", { class: "cap", x1: x(end), x2: x(end), y1: cy - 7, y2: cy + 7 }, g);
+      // A retirement already set for a future year: a dashed stretch from today to an open cap.
+      const due = LL.yr(a, "scheduled");
+      if (due != null && !retired && !a.never_standard) {
+        g.setAttribute("data-scheduled", due);
+        el("line", { class: "ahead", x1: x(end), x2: x(due), y1: cy, y2: cy }, g);
+        el("line", { class: "duecap", x1: x(due), x2: x(due), y1: cy - 7, y2: cy + 7 }, g);
+      }
       // Attacks that came after retirement (SHA-1, SHA-0, Triple DES...) hang off a dotted line.
       const late = a.events.filter((e) => e.year > end && (e.kind === "weak" || e.kind === "broken"));
       if (late.length) {
@@ -71,12 +80,12 @@
     node.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   };
 
-  const KIND = { born: "born", weak: "weakened", broken: "broken", retired: "retired" };
+  const KIND = { born: "born", weak: "weakened", broken: "broken", retired: "retired", scheduled: "to retire" };
   function pick(name, show) {
     picked = name;
     const a = data.algorithms.find((x) => x.name === name);
     const evs = [...a.events].sort((p, q) => p.year - q.year);
-    $("detail").innerHTML = `<h3>${esc(a.name)}</h3><p class="fam">${esc(a.family)} · ${esc(LL.status(a))}${LL.yr(a, "retired") == null && !a.never_standard ? " · still in use" : ""}</p><ol>` +
+    $("detail").innerHTML = `<h3>${esc(a.name)}</h3><p class="fam">${esc(a.family)} · ${esc(LL.status(a))}${LL.yr(a, "retired") == null && !a.never_standard ? " · still in use" : ""}${LL.yr(a, "scheduled") != null && LL.yr(a, "retired") == null ? ", disallowed after " + LL.yr(a, "scheduled") : ""}</p><ol>` +
       evs.map((e) => `<li data-kind="${e.kind}"><b>${e.year}</b><span class="k">${KIND[e.kind]}</span>${esc(e.what)}<q><a href="${esc(e.url)}" rel="noopener">${esc(e.quote)}</a></q></li>`).join("") +
       `</ol>${a.note ? `<p class="note">${esc(a.note)}</p>` : ""}` +
       `<p class="back"><button type="button" id="to-chart">↑ back to the chart</button> <a href="#${slug(name)}" id="share">link to ${esc(a.short)}</a></p>`;
